@@ -29,8 +29,8 @@ namespace ImgIO
 Image::Impl::Impl()
 : mWidth(0),
   mHeight(0),
-  mFormat(Image::Format::kUnspecified),
-  mChannelDepth(Image::ChannelDepth::kUnspecified),
+  mColorFormat(Color::Format::kUnspecified),
+  mColorChannelDepth(Color::ChannelDepth::kUnspecified),
   mData(nullptr),
   mDataSize(0)
 {
@@ -39,8 +39,8 @@ Image::Impl::Impl()
 Image::Impl::Impl(Impl&& aImpl)
 : mWidth(0),
   mHeight(0),
-  mFormat(Image::Format::kUnspecified),
-  mChannelDepth(Image::ChannelDepth::kUnspecified),
+  mColorFormat(Color::Format::kUnspecified),
+  mColorChannelDepth(Color::ChannelDepth::kUnspecified),
   mData(nullptr),
   mDataSize(0)
 {
@@ -52,11 +52,11 @@ Image::Impl::Impl(Impl&& aImpl)
     mHeight = aImpl.mHeight;
     aImpl.mHeight = 0;
 
-    mFormat = aImpl.mFormat;
-    aImpl.mFormat = Image::Format::kUnspecified;
+    mColorFormat = aImpl.mColorFormat;
+    aImpl.mColorFormat = Color::Format::kUnspecified;
 
-    mChannelDepth = aImpl.mChannelDepth;
-    aImpl.mChannelDepth = Image::ChannelDepth::kUnspecified;
+    mColorChannelDepth = aImpl.mColorChannelDepth;
+    aImpl.mColorChannelDepth = Color::ChannelDepth::kUnspecified;
 
     mData.swap(aImpl.mData);
 
@@ -67,8 +67,8 @@ Image::Impl::Impl(Impl&& aImpl)
 Image::Impl::Impl(const Impl& aImpl)
 : mWidth(0),
   mHeight(0),
-  mFormat(Image::Format::kUnspecified),
-  mChannelDepth(Image::ChannelDepth::kUnspecified),
+  mColorFormat(Color::Format::kUnspecified),
+  mColorChannelDepth(Color::ChannelDepth::kUnspecified),
   mData(nullptr),
   mDataSize(0)
 {
@@ -76,8 +76,8 @@ Image::Impl::Impl(const Impl& aImpl)
 
     mWidth = aImpl.mWidth;
     mHeight = aImpl.mHeight;
-    mFormat = aImpl.mFormat;
-    mChannelDepth = aImpl.mChannelDepth;
+    mColorFormat = aImpl.mColorFormat;
+    mColorChannelDepth = aImpl.mColorChannelDepth;
     mDataSize = aImpl.mDataSize;
     mData = std::shared_ptr<uint8_t>(new uint8_t[aImpl.mDataSize]);
     std::memcpy(mData.get(), aImpl.mData.get(), aImpl.mDataSize);
@@ -85,25 +85,25 @@ Image::Impl::Impl(const Impl& aImpl)
 
 Image::Impl::Impl(unsigned int aWidth,
                   unsigned int aHeight,
-                  Image::Format aFormat,
-                  ChannelDepth aChannelDepth,
+                  Color::Format aColorFormat,
+                  Color::ChannelDepth aColorChannelDepth,
                   uint8_t* aData)
 : mWidth(0),
   mHeight(0),
-  mFormat(Image::Format::kUnspecified),
-  mChannelDepth(Image::ChannelDepth::kUnspecified),
+  mColorFormat(Color::Format::kUnspecified),
+  mColorChannelDepth(Color::ChannelDepth::kUnspecified),
   mData(nullptr),
   mDataSize(0)
 {
-    size_t pixelSize = static_cast<int>(aFormat) * static_cast<int>(aChannelDepth);
+    size_t pixelSize = static_cast<int>(aColorFormat) * static_cast<int>(aColorChannelDepth);
     size_t lineSize = aWidth * pixelSize;
     size_t dataSize = aHeight * lineSize;
 
     if (dataSize > 0) {
         mWidth = aWidth;
         mHeight = aHeight;
-        mFormat = aFormat;
-        mChannelDepth = aChannelDepth;
+        mColorFormat = aColorFormat;
+        mColorChannelDepth = aColorChannelDepth;
         mData.reset(aData ? aData : new uint8_t[dataSize]);
         mDataSize = dataSize;
     }
@@ -114,14 +114,14 @@ bool Image::Impl::isValid() const
     return static_cast<bool>(mData);
 }
 
-Image::Format Image::Impl::format() const
+Color::Format Image::Impl::colorFormat() const
 {
-    return mFormat;
+    return mColorFormat;
 }
 
-Image::ChannelDepth Image::Impl::channelDepth() const
+Color::ChannelDepth Image::Impl::colorChannelDepth() const
 {
-    return mChannelDepth;
+    return mColorChannelDepth;
 }
 
 unsigned int Image::Impl::width() const
@@ -144,7 +144,7 @@ void Image::Impl::composite(int aX,
                             const Image::Impl& aImpl,
                             CompositeOperation aCompositeOperation)
 {
-    throw std::logic_error("Not implemented.s");
+    throw NotImplementedException("Not implemented.s");
 }
 
 Image::Impl Image::Impl::cropped(unsigned int aX,
@@ -159,9 +159,9 @@ Image::Impl Image::Impl::cropped(unsigned int aX,
     if ((aY + aHeight) > mHeight)
         aHeight = mHeight - aY;
 
-    Image::Impl croppedImage(aWidth, aHeight, mFormat, mChannelDepth);
+    Image::Impl croppedImage(aWidth, aHeight, mColorFormat, mColorChannelDepth);
 
-    size_t pixelSize = static_cast<int>(mFormat) * static_cast<int>(mChannelDepth);
+    size_t pixelSize = static_cast<int>(mColorFormat) * static_cast<int>(mColorChannelDepth);
     size_t srcLineSize = mWidth * pixelSize;
     size_t destLineSize = aWidth * pixelSize;
 
@@ -179,49 +179,49 @@ Image::Impl Image::Impl::cropped(unsigned int aX,
     return croppedImage;
 }
 
-Image::Impl Image::Impl::convertedTo(Image::Format aFormat,
-                                     Image::ChannelDepth aChannelDepth) const
+Image::Impl Image::Impl::convertedTo(Color::Format aFormat,
+                                     Color::ChannelDepth aChannelDepth) const
 {
-    if ((mFormat == aFormat) && (mChannelDepth == aChannelDepth))
+    if ((mColorFormat == aFormat) && (mColorChannelDepth == aChannelDepth))
         return Image::Impl(*this);
 
     void (*convertFunc)(const uint8_t* aSrc, uint8_t* aDest, size_t aPixelsCount) = nullptr;
 
-    switch(mFormat)
+    switch(mColorFormat)
     {
-    case Format::kRGB:
+    case Color::Format::kRGB:
     {
-        if (mChannelDepth == ChannelDepth::k8Bit) {
-            if ((aFormat == Format::kRGB) && (aChannelDepth == ChannelDepth::k16Bit))
+        if (mColorChannelDepth == Color::ChannelDepth::k8Bit) {
+            if ((aFormat == Color::Format::kRGB) && (aChannelDepth == Color::ChannelDepth::k16Bit))
                 convertFunc = convertRGB8BitToRGB16Bit;
-            else if ((aFormat == Format::kRGBA) && (aChannelDepth == ChannelDepth::k8Bit))
+            else if ((aFormat == Color::Format::kRGBA) && (aChannelDepth == Color::ChannelDepth::k8Bit))
                 convertFunc = convertRGB8BitToRGBA8Bit;
-            else if ((aFormat == Format::kRGBA) && (aChannelDepth == ChannelDepth::k16Bit))
+            else if ((aFormat == Color::Format::kRGBA) && (aChannelDepth == Color::ChannelDepth::k16Bit))
                 convertFunc = convertRGB8BitToRGBA16Bit;
-        } else if (mChannelDepth == ChannelDepth::k16Bit) {
-            if ((aFormat == Format::kRGB) && (aChannelDepth == ChannelDepth::k8Bit))
+        } else if (mColorChannelDepth == Color::ChannelDepth::k16Bit) {
+            if ((aFormat == Color::Format::kRGB) && (aChannelDepth == Color::ChannelDepth::k8Bit))
                 convertFunc = convertRGB16BitToRGB8Bit;
-            else if ((aFormat == Format::kRGBA) && (aChannelDepth == ChannelDepth::k8Bit))
+            else if ((aFormat == Color::Format::kRGBA) && (aChannelDepth == Color::ChannelDepth::k8Bit))
                 convertFunc = convertRGB16BitToRGBA8Bit;
-            else if ((aFormat == Format::kRGBA) && (aChannelDepth == ChannelDepth::k16Bit))
+            else if ((aFormat == Color::Format::kRGBA) && (aChannelDepth == Color::ChannelDepth::k16Bit))
                 convertFunc = convertRGB16BitToRGBA16Bit;
         }
     }
-    case Format::kRGBA:
+    case Color::Format::kRGBA:
     {
-        if (mChannelDepth == ChannelDepth::k8Bit) {
-            if ((aFormat == Format::kRGBA) && (aChannelDepth == ChannelDepth::k16Bit))
+        if (mColorChannelDepth == Color::ChannelDepth::k8Bit) {
+            if ((aFormat == Color::Format::kRGBA) && (aChannelDepth == Color::ChannelDepth::k16Bit))
                 convertFunc = convertRGBA8BitToRGBA16Bit;
-            else if ((aFormat == Format::kRGB) && (aChannelDepth == ChannelDepth::k8Bit))
+            else if ((aFormat == Color::Format::kRGB) && (aChannelDepth == Color::ChannelDepth::k8Bit))
                 convertFunc = convertRGBA8BitToRGB8Bit;
-            else if ((aFormat == Format::kRGB) && (aChannelDepth == ChannelDepth::k16Bit))
+            else if ((aFormat == Color::Format::kRGB) && (aChannelDepth == Color::ChannelDepth::k16Bit))
                 convertFunc = convertRGBA8BitToRGB16Bit;
-        } else if (mChannelDepth == ChannelDepth::k16Bit) {
-            if ((aFormat == Format::kRGBA) && (aChannelDepth == ChannelDepth::k8Bit))
+        } else if (mColorChannelDepth == Color::ChannelDepth::k16Bit) {
+            if ((aFormat == Color::Format::kRGBA) && (aChannelDepth == Color::ChannelDepth::k8Bit))
                 convertFunc = convertRGBA16BitToRGBA8Bit;
-            else if ((aFormat == Format::kRGB) && (aChannelDepth == ChannelDepth::k8Bit))
+            else if ((aFormat == Color::Format::kRGB) && (aChannelDepth == Color::ChannelDepth::k8Bit))
                 convertFunc = convertRGBA16BitToRGB8Bit;
-            else if ((aFormat == Format::kRGB) && (aChannelDepth == ChannelDepth::k16Bit))
+            else if ((aFormat == Color::Format::kRGB) && (aChannelDepth == Color::ChannelDepth::k16Bit))
                 convertFunc = convertRGBA16BitToRGB16Bit;
         }
     }
@@ -246,8 +246,8 @@ Image::Impl& Image::Impl::operator=(const Image::Impl& aImpl)
 
     mWidth = aImpl.mWidth;
     mHeight = aImpl.mHeight;
-    mFormat = aImpl.mFormat;
-    mChannelDepth = aImpl.mChannelDepth;
+    mColorFormat = aImpl.mColorFormat;
+    mColorChannelDepth = aImpl.mColorChannelDepth;
     mDataSize = aImpl.mDataSize;
     mData = std::shared_ptr<uint8_t>(new uint8_t[aImpl.mDataSize]);
     std::memcpy(mData.get(), aImpl.mData.get(), aImpl.mDataSize);
@@ -265,11 +265,11 @@ Image::Impl& Image::Impl::operator=(Image::Impl&& aImpl)
     mHeight = aImpl.mHeight;
     aImpl.mHeight = 0;
 
-    mFormat = aImpl.mFormat;
-    aImpl.mFormat = Image::Format::kUnspecified;
+    mColorFormat = aImpl.mColorFormat;
+    aImpl.mColorFormat = Color::Format::kUnspecified;
 
-    mChannelDepth = aImpl.mChannelDepth;
-    aImpl.mChannelDepth = Image::ChannelDepth::kUnspecified;
+    mColorChannelDepth = aImpl.mColorChannelDepth;
+    aImpl.mColorChannelDepth = Color::ChannelDepth::kUnspecified;
 
     mData.swap(aImpl.mData);
 

@@ -152,8 +152,8 @@ private:
 };
 
 static Image readJpeg(DataReader& aDataReader,
-                     Image::Format aOutputImageformat,
-                     Image::ChannelDepth aOutputImageChannelDepth)
+                      Color::Format aOutputImageformat,
+                      Color::ChannelDepth aOutputImageChannelDepth)
 {
     std::function<void(struct jpeg_decompress_struct*)> decompressInfoAutoCleanupFunction =
             [](struct jpeg_decompress_struct* aDecompressInfo) {
@@ -180,7 +180,7 @@ static Image readJpeg(DataReader& aDataReader,
 
     jpeg_start_decompress(&decompressInfo);
 
-    size_t rowSize = decompressInfo.output_width * static_cast<int>(Image::Format::kRGB) * static_cast<int>(Image::ChannelDepth::k8Bit);
+    size_t rowSize = decompressInfo.output_width * static_cast<int>(Color::Format::kRGB) * static_cast<int>(Color::ChannelDepth::k8Bit);
     size_t dataSize = decompressInfo.output_height * rowSize;
 
     std::unique_ptr<uint8_t> data(new uint8_t[dataSize]);
@@ -200,8 +200,8 @@ static Image readJpeg(DataReader& aDataReader,
 
     return Image(decompressInfo.output_width,
                  decompressInfo.output_height,
-                 Image::Format::kRGB,
-                 Image::ChannelDepth::k8Bit,
+                 Color::Format::kRGB,
+                 Color::ChannelDepth::k8Bit,
                  data.release());
 }
 
@@ -209,7 +209,7 @@ static void writeJpeg(DataWriter& aDataWriter,
                      const Image& aImage)
 {
     int quality = 75;
-    if ((aImage.format() != Image::Format::kRGB) || (aImage.channelDepth() != Image::ChannelDepth::k8Bit)) {
+    if ((aImage.colorFormat() != Color::Format::kRGB) || (aImage.colorChannelDepth() != Color::ChannelDepth::k8Bit)) {
         throw std::logic_error("Expected RGB (8bit per channel) image");
     }
 
@@ -229,7 +229,7 @@ static void writeJpeg(DataWriter& aDataWriter,
     jpeg_set_quality(&compressInfo, quality, true);
 
 
-    size_t rowLength = aImage.width() * static_cast<int>(aImage.format()) * static_cast<int>(aImage.channelDepth());
+    size_t rowLength = aImage.width() * static_cast<int>(aImage.colorFormat()) * static_cast<int>(aImage.colorChannelDepth());
 
     JpegDestinationManager destinationManager(&compressInfo, aDataWriter, rowLength);
 
@@ -251,8 +251,8 @@ static void writeJpeg(DataWriter& aDataWriter,
 }
 
 Image JpegIO::read(std::istream& aPngDataStream,
-                  Image::Format aOutputImageformat,
-                  Image::ChannelDepth aOutputImageChannelDepth)
+                  Color::Format aOutputImageformat,
+                  Color::ChannelDepth aOutputImageChannelDepth)
 {
     StreamReader streamReader(aPngDataStream);
     return readJpeg(streamReader,
@@ -262,8 +262,8 @@ Image JpegIO::read(std::istream& aPngDataStream,
 
 Image JpegIO::read(const uint8_t* aData,
                   size_t aLength,
-                  Image::Format aOutputImageformat,
-                  Image::ChannelDepth aOutputImageChannelDepth)
+                  Color::Format aOutputImageformat,
+                  Color::ChannelDepth aOutputImageChannelDepth)
 {
     MemoryReader memoryReader(aData, aLength);
     return readJpeg(memoryReader,

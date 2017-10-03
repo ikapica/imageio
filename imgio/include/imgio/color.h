@@ -21,34 +21,56 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _JPEGIO_H__
-#define _JPEGIO_H__
+#ifndef __IMAGEIO_COLOR_H__
+#define __IMAGEIO_COLOR_H__
 
-#include <iostream>
-#include <imgio/image.h>
+namespace ImgIO
+{
 
-namespace ImgIO {
-
-class JpegIO {
+class Color
+{
 public:
-    static Image read(std::istream &aPngDataStream,
-                      Color::Format aOutputImageformat = Color::Format::kRGBA,
-                      Color::ChannelDepth aOutputImageChannelDepth = Color::ChannelDepth::k8Bit);
+    enum class ChannelDepth {
+        kUnspecified = 0,
+        k8Bit = 1,
+        k16Bit = 2
+    }; // enum class ColorChannelDepth
 
-    static Image read(const uint8_t *aData,
-                      size_t aLength,
-                      Color::Format aOutputImageformat = Color::Format::kRGBA,
-                      Color::ChannelDepth aOutputImageChannelDepth = Color::ChannelDepth::k8Bit);
+    enum class Format {
+        kUnspecified = 0,
+        kMonochromatic = 1,
+        kRGB = 3,
+        kRGBA = 4,
+    }; // enum class ColorFormat
 
-    static void write(const Image &aImage,
-                      std::ostream &aPngDataStream);
+public:
+    Color() = default;
+    virtual ~Color() = default;
 
-    static void write(const Image &aImage,
-                      uint8_t *aData,
-                      size_t aLength);
-}; // class JpegIO
+    virtual Color::ChannelDepth channelDepth() const = 0;
+    virtual Color::Format format() const = 0;
+}; // class Color
 
-} // namespace ImgIO
+class ColorRGB8 : public Color
+{
+public:
+}; // class ColorRBG8
 
-#endif // _JPEGIO_H__
-// EOF
+class ColorRGBA8 : public Color
+{
+public:
+}; // class ColorRBGA8
+
+class ColorRGB16 : public Color
+{
+public:
+}; // class ColorRBG16
+
+class ColorRGBA16 : public Color
+{
+public:
+}; // class ColorRBGA16
+
+}; // namespace ImgIO
+
+#endif // __IMAGEIO_COLOR_H__

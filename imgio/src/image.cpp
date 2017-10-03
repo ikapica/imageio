@@ -39,8 +39,8 @@ Image::Image(const Image& aImage)
 : mImpl(new Impl(*aImage.mImpl))
 {}
 
-Image::Image(unsigned int aWidth, unsigned int aHeight, Format aFormat, Image::ChannelDepth aChannelDepth, uint8_t* aData)
-: mImpl(new Impl(aWidth, aHeight, aFormat, aChannelDepth, aData))
+Image::Image(unsigned int aWidth, unsigned int aHeight, Color::Format aColorFormat, Color::ChannelDepth aColorChannelDepth, uint8_t* aData)
+: mImpl(new Impl(aWidth, aHeight, aColorFormat, aColorChannelDepth, aData))
 {}
 
 Image::Image(Impl&& aImpl)
@@ -56,14 +56,14 @@ bool Image::isValid() const
     return mImpl->isValid();
 }
 
-Image::Format Image::format() const
+Color::Format Image::colorFormat() const
 {
-    return mImpl->format();
+    return mImpl->colorFormat();
 }
 
-Image::ChannelDepth Image::channelDepth() const
+Color::ChannelDepth Image::colorChannelDepth() const
 {
-    return mImpl->channelDepth();
+    return mImpl->colorChannelDepth();
 }
 
 unsigned int Image::width() const
@@ -98,8 +98,8 @@ Image Image::cropped(unsigned int aX,
     return mImpl->cropped(aX, aY, aWidth, aHeight);
 }
 
-Image Image::convertedTo(Image::Format aFormat,
-                         Image::ChannelDepth aChannelDepth)
+Image Image::convertedTo(Color::Format aFormat,
+                         Color::ChannelDepth aChannelDepth)
 {
     return mImpl->convertedTo(aFormat, aChannelDepth);
 }

@@ -33,5 +33,9 @@ file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/imgio/*.h)
 
 include(${CMAKE_SOURCE_DIR}/cmake/LibraryConfig.cmake)
 
+
+target_compile_definitions(${LIBRARY_NAME} PRIVATE PNGIO_ENABLED)
+target_compile_definitions(${LIBRARY_NAME} PRIVATE JPEGIO_ENABLED)
+
 target_include_directories(${LIBRARY_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/> /usr/local/include)
 target_link_libraries(${LIBRARY_NAME} -L/usr/local/lib png jpeg)

@@ -21,34 +21,47 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _JPEGIO_H__
-#define _JPEGIO_H__
 
-#include <iostream>
-#include <imgio/image.h>
+#include <imgio/imageio.h>
 
-namespace ImgIO {
+#ifdef PNGIO_ENABLED
+#include "pngio.h"
+#endif // PNGIO_ENABLED
 
-class JpegIO {
-public:
-    static Image read(std::istream &aPngDataStream,
-                      Color::Format aOutputImageformat = Color::Format::kRGBA,
-                      Color::ChannelDepth aOutputImageChannelDepth = Color::ChannelDepth::k8Bit);
+#ifdef JPEGIO_ENABLED
+#include "jpegio.h"
+#endif // JPEGIO_ENABLED
 
-    static Image read(const uint8_t *aData,
-                      size_t aLength,
-                      Color::Format aOutputImageformat = Color::Format::kRGBA,
-                      Color::ChannelDepth aOutputImageChannelDepth = Color::ChannelDepth::k8Bit);
+namespace ImgIO
+{
 
-    static void write(const Image &aImage,
-                      std::ostream &aPngDataStream);
+Image ImageIO::read(std::istream &aInputDataStream,
+                    ImageFormat aInputImageFormat,
+                    Color::Format aOutputImageColorformat,
+                    Color::ChannelDepth aOutputImageChannelDepth)
+{
+}
 
-    static void write(const Image &aImage,
-                      uint8_t *aData,
-                      size_t aLength);
-}; // class JpegIO
+Image ImageIO::read(const uint8_t *aInputData,
+                    size_t aLength,
+                    ImageFormat aInputImageFormat,
+                    Color::Format aOutputImageColorformat,
+                    Color::ChannelDepth aOutputImageChannelDepth)
+{
+}
+
+void ImageIO::write(const Image &aImage,
+                    std::ostream &aOutputDataStream,
+                    ImageFormat aImageFormat)
+{
+}
+
+void ImageIO::write(const Image &aImage,
+                    uint8_t *aOutputDataBuf,
+                    size_t aOutputDataBufLength,
+                    ImageFormat aImageFormat)
+{
+}
 
 } // namespace ImgIO
-
-#endif // _JPEGIO_H__
 // EOF
