@@ -21,34 +21,44 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _JPEGIO_H__
-#define _JPEGIO_H__
+#ifndef __IMAGEIO_IMAGEIO_H__
+#define __IMAGEIO_IMAGEIO_H__
 
 #include <iostream>
 #include <imgio/image.h>
 
 namespace ImgIO {
 
-class JpegIO {
+class ImageIO
+{
 public:
-    static Image read(std::istream &aPngDataStream,
-                      ColorSpec::Format aOutputImageformat = ColorSpec::Format::kRGBA,
+    enum class ImageFormat {kUnspecified = 0,
+                            kRaw = 1,
+                            kPng = 2,
+                            kJpeg = 3};
+public:
+    static Image read(std::istream &aInputDataStream,
+                      ImageFormat aInputImageFormat = ImageFormat::kUnspecified,
+                      ColorSpec::Format aOutputImageColorformat = ColorSpec::Format::kRGBA,
                       ColorSpec::ChannelDepth aOutputImageChannelDepth = ColorSpec::ChannelDepth::k8Bit);
 
-    static Image read(const uint8_t *aData,
+    static Image read(const uint8_t *aInputData,
                       size_t aLength,
-                      ColorSpec::Format aOutputImageformat = ColorSpec::Format::kRGBA,
+                      ImageFormat aInputImageFormat = ImageFormat::kUnspecified,
+                      ColorSpec::Format aOutputImageColorformat = ColorSpec::Format::kRGBA,
                       ColorSpec::ChannelDepth aOutputImageChannelDepth = ColorSpec::ChannelDepth::k8Bit);
 
     static void write(const Image &aImage,
-                      std::ostream &aPngDataStream);
+                      std::ostream &aOutputDataStream,
+                      ImageFormat aImageFormat = ImageFormat::kUnspecified);
 
     static void write(const Image &aImage,
-                      uint8_t *aData,
-                      size_t aLength);
-}; // class JpegIO
+                      uint8_t *aOutputDataBuf,
+                      size_t aOutputDataBufLength,
+                      ImageFormat aImageFormat = ImageFormat::kUnspecified);
+}; // class ImageIO
 
 } // namespace ImgIO
 
-#endif // _JPEGIO_H__
+#endif // __IMAGEIO_IMAGEIO_H__
 // EOF

@@ -21,34 +21,38 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#ifndef _JPEGIO_H__
-#define _JPEGIO_H__
+#ifndef __IMAGEIO_EXCEPTION_H__
+#define __IMAGEIO_EXCEPTION_H__
 
-#include <iostream>
-#include <imgio/image.h>
+#include <string>
 
 namespace ImgIO {
 
-class JpegIO {
+class Exception
+{
 public:
-    static Image read(std::istream &aPngDataStream,
-                      ColorSpec::Format aOutputImageformat = ColorSpec::Format::kRGBA,
-                      ColorSpec::ChannelDepth aOutputImageChannelDepth = ColorSpec::ChannelDepth::k8Bit);
+    Exception()
+    {}
 
-    static Image read(const uint8_t *aData,
-                      size_t aLength,
-                      ColorSpec::Format aOutputImageformat = ColorSpec::Format::kRGBA,
-                      ColorSpec::ChannelDepth aOutputImageChannelDepth = ColorSpec::ChannelDepth::k8Bit);
+    Exception(const std::string& what)
+    : mWhat(what)
+    {}
 
-    static void write(const Image &aImage,
-                      std::ostream &aPngDataStream);
+    std::string what() const
+    {
+        return mWhat;
+    }
 
-    static void write(const Image &aImage,
-                      uint8_t *aData,
-                      size_t aLength);
-}; // class JpegIO
+private:
+    std::string mWhat;
+}; // class Exception
 
-} // namespace ImgIO
+typedef Exception NotImplementedException;
 
-#endif // _JPEGIO_H__
-// EOF
+typedef Exception UnsupportedOperationException;
+
+typedef Exception UnsupportedImageFormatException;
+
+}; // namespace ImgIO
+
+#endif // __IMAGEIO_EXCEPTION_H__

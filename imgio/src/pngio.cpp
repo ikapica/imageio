@@ -58,8 +58,8 @@ static void flushDataHandler(png_structp pngPtr)
 }
 
 static Image readPng(DataReader& aDataReader,
-                     Image::Format aOutputImageformat,
-                     Image::ChannelDepth aOutputImageChannelDepth)
+                     ColorSpec::Format aOutputImageformat,
+                     ColorSpec::ChannelDepth aOutputImageChannelDepth)
 {
     png_byte pngSig[PNGSIGSIZE];
 
@@ -118,18 +118,18 @@ static Image readPng(DataReader& aDataReader,
         pngImageChannels += 1;
     }
 
-    if ((pngImageChannelDepth == 16) && (aOutputImageChannelDepth == Image::ChannelDepth::k8Bit)) {
+    if ((pngImageChannelDepth == 16) && (aOutputImageChannelDepth == ColorSpec::ChannelDepth::k8Bit)) {
         png_set_strip_16(pngImage.get());
     }
 
-    if ((aOutputImageformat == Image::Format::kRGBA) && (pngImageFormat == PNG_COLOR_TYPE_RGB))
+    if ((aOutputImageformat == ColorSpec::Format::kRGBA) && (pngImageFormat == PNG_COLOR_TYPE_RGB))
     {
         png_set_add_alpha(pngImage.get(), 255, PNG_FILLER_AFTER);
         pngImageFormat = PNG_COLOR_TYPE_RGBA;
         pngImageChannels += 1;
     }
 
-    if ((aOutputImageformat == Image::Format::kRGB) && (pngImageFormat == PNG_COLOR_TYPE_RGBA))
+    if ((aOutputImageformat == ColorSpec::Format::kRGB) && (pngImageFormat == PNG_COLOR_TYPE_RGBA))
     {
         png_set_strip_alpha(pngImage.get());
         pngImageFormat = PNG_COLOR_TYPE_RGB;
@@ -156,7 +156,7 @@ static Image readPng(DataReader& aDataReader,
 }
 
 static void writePng(DataWriter& aDataWriter,
-                     const Image& aImage)
+                     Image& aImage)
 {
     std::unique_ptr<png_struct, std::function<void(png_structp)>> pngImage(nullptr,
                                                                            [](png_structp pngImagePtr) { png_destroy_write_struct(&pngImagePtr, nullptr); });
@@ -186,12 +186,12 @@ static void writePng(DataWriter& aDataWriter,
     int pngBitDepth = 0;
     int pngColorType = 0;
 
-    switch(aImage.channelDepth())
+    switch(aImage.colorChannelDepth())
     {
-        case Image::ChannelDepth::k8Bit:
+        case ColorSpec::ChannelDepth::k8Bit:
             pngBitDepth = 8;
             break;
-        case Image::ChannelDepth::k16Bit:
+        case ColorSpec::ChannelDepth::k16Bit:
             pngBitDepth = 16;
             break;
         default:
@@ -199,16 +199,16 @@ static void writePng(DataWriter& aDataWriter,
             break;
     }
 
-    switch(aImage.format())
+    switch(aImage.colorFormat())
     {
-        case Image::Format::kRGB:
+        case ColorSpec::Format::kRGB:
             pngColorType = PNG_COLOR_TYPE_RGB;
             break;
-        case Image::Format::kRGBA:
+        case ColorSpec::Format::kRGBA:
             pngColorType = PNG_COLOR_TYPE_RGBA;
             break;
         default:
-            throw std::logic_error("Unsupported image format");
+            throw std::logic_error("Unsupported image colorFormat");
             break;
     }
 
@@ -232,9 +232,9 @@ static void writePng(DataWriter& aDataWriter,
 
     png_write_info(pngImage.get(), pngImageInfo.get());
 
-    const uint8_t* row = aImage.data();
-    size_t rowLength = aImage.width() * static_cast<int>(aImage.format()) * static_cast<int>(aImage.channelDepth());
-    for (int y = 0 ; y < aImage.height() ; ++y) {
+    uint8_t* row = aImage.data();
+    size_t rowLength = aImage.width() * static_cast<int>(aImage.colorFormat()) * static_cast<int>(aImage.colorChannelDepth());
+    for (size_t y = 0 ; y < aImage.height() ; ++y) {
         png_write_row(pngImage.get(), row);
         row += rowLength;
     }
@@ -243,8 +243,8 @@ static void writePng(DataWriter& aDataWriter,
 }
 
 Image PngIO::read(std::istream& aPngDataStream,
-                  Image::Format aOutputImageformat,
-                  Image::ChannelDepth aOutputImageChannelDepth)
+                  ColorSpec::Format aOutputImageformat,
+                  ColorSpec::ChannelDepth aOutputImageChannelDepth)
 {
     StreamReader streamReader(aPngDataStream);
     return readPng(streamReader,
@@ -254,8 +254,8 @@ Image PngIO::read(std::istream& aPngDataStream,
 
 Image PngIO::read(const uint8_t* aData,
                   size_t aLength,
-                  Image::Format aOutputImageformat,
-                  Image::ChannelDepth aOutputImageChannelDepth)
+                  ColorSpec::Format aOutputImageformat,
+                  ColorSpec::ChannelDepth aOutputImageChannelDepth)
 {
     MemoryReader memoryReader(aData, aLength);
     return readPng(memoryReader,
@@ -263,13 +263,13 @@ Image PngIO::read(const uint8_t* aData,
                    aOutputImageChannelDepth);
 }
 
-void PngIO::write(const Image& aImage, std::ostream& aPngDataStream)
+void PngIO::write(Image& aImage, std::ostream& aPngDataStream)
 {
     StreamWriter streamWriter(aPngDataStream);
     writePng(streamWriter, aImage);
 }
 
-void PngIO::write(const Image& aImage, uint8_t* aData, size_t aLength)
+void PngIO::write(Image& aImage, uint8_t* aData, size_t aLength)
 {
     MemoryWriter streamWriter(aData, aLength);
     writePng(streamWriter, aImage);

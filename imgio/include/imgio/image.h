@@ -24,7 +24,9 @@
 #ifndef _IMAGEIO_IMAGE_H__
 #define _IMAGEIO_IMAGE_H__
 
-#include <string>
+#include <memory>
+#include <imgio/exception.h>
+#include <imgio/color.h>
 
 namespace ImgIO
 {
@@ -32,19 +34,6 @@ namespace ImgIO
 class Image
 {
 public:
-    enum class ChannelDepth {
-        kUnspecified = 0,
-        k8Bit = 1,
-        k16Bit = 2
-    }; // enum class ChannelDepth
-
-    enum class Format {
-        kUnspecified = 0,
-        kMonochromatic = 1,
-        kRGB = 3,
-        kRGBA = 4,
-    }; // enum class Format
-
     enum class CompositeOperation
     {
         kCopy,
@@ -56,18 +45,18 @@ public:
     Image(const Image& aImage);
     Image(unsigned int aWidth,
           unsigned int aHeight,
-          Image::Format aFormat = Image::Format::kRGB,
-          Image::ChannelDepth aChannelDepth = Image::ChannelDepth::k8Bit,
+          ColorSpec::Format aColorFormat = ColorSpec::Format::kRGB,
+          ColorSpec::ChannelDepth aColorChannelDepth = ColorSpec::ChannelDepth::k8Bit,
           uint8_t* aData = nullptr);
     ~Image();
 
     bool isValid() const;
-    Image::Format format() const;
-    Image::ChannelDepth channelDepth() const;
+    ColorSpec::Format colorFormat() const;
+    ColorSpec::ChannelDepth colorChannelDepth() const;
     unsigned int width() const;
     unsigned int height() const;
     const uint8_t* data() const;
-
+    uint8_t* data();
 
     Image& composite(int aX,
                      int aY,
@@ -79,8 +68,8 @@ public:
                   unsigned int aWidth,
                   unsigned int aHeight) const;
 
-    Image convertedTo(Image::Format aFormat,
-                      Image::ChannelDepth aChannelDepth = Image::ChannelDepth::k8Bit);
+    Image convertedTo(ColorSpec::Format aFormat,
+                      ColorSpec::ChannelDepth aChannelDepth = ColorSpec::ChannelDepth::k8Bit);
 private:
     class Impl;
 private:

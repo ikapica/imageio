@@ -24,6 +24,7 @@
 #ifndef _DATAIO_H__
 #define _DATAIO_H__
 
+#include <cstring>
 #include <iostream>
 
 namespace ImgIO

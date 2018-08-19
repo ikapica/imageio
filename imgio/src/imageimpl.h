@@ -38,16 +38,17 @@ public:
     Impl(const Impl& aImpl);
     Impl(unsigned int aWidth,
          unsigned int aHeight,
-         Image::Format aFormat = Image::Format::kRGB,
-         Image::ChannelDepth aChannelDepth = Image::ChannelDepth::k8Bit,
+         ColorSpec::Format aColorFormat = ColorSpec::Format::kRGB,
+         ColorSpec::ChannelDepth aColorChannelDepth = ColorSpec::ChannelDepth::k8Bit,
          uint8_t* aData = nullptr);
 
     bool isValid() const;
-    Image::Format format() const;
-    Image::ChannelDepth channelDepth() const;
+    ColorSpec::Format colorFormat() const;
+    ColorSpec::ChannelDepth colorChannelDepth() const;
     unsigned int width() const;
     unsigned int height() const;
     const uint8_t* data() const;
+    uint8_t* data();
 
     void composite(int aX,
                    int aY,
@@ -59,8 +60,8 @@ public:
                         unsigned int aWidth,
                         unsigned int aHeight) const;
 
-    Image::Impl convertedTo(Image::Format aFormat,
-                      Image::ChannelDepth aChannelDepth = Image::ChannelDepth::k8Bit) const;
+    Image::Impl convertedTo(ColorSpec::Format aFormat,
+                            ColorSpec::ChannelDepth aChannelDepth = ColorSpec::ChannelDepth::k8Bit) const;
 
     Image::Impl& operator=(const Image::Impl& aImpl);
     Image::Impl& operator=(Image::Impl&& aImpl);
@@ -85,13 +86,12 @@ public:
 private:
     unsigned int mWidth;
     unsigned int mHeight;
-    Image::Format mFormat;
-    ChannelDepth mChannelDepth;
+    ColorSpec::Format mColorFormat;
+    ColorSpec::ChannelDepth mColorChannelDepth;
     std::shared_ptr<uint8_t> mData;
     size_t mDataSize;
     mutable std::mutex mDataMutex;
 }; // class Image::Impl
-
 
 } // namespace ImgIO
 

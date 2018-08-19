@@ -33,15 +33,15 @@ class PngIO
 {
 public:
     static Image read(std::istream& aPngDataStream,
-                      Image::Format aOutputImageformat = Image::Format::kRGBA,
-                      Image::ChannelDepth aOutputImageChannelDepth = Image::ChannelDepth::k8Bit);
+                      ColorSpec::Format aOutputImageformat = ColorSpec::Format::kRGBA,
+                      ColorSpec::ChannelDepth aOutputImageChannelDepth = ColorSpec::ChannelDepth::k8Bit);
     static Image read(const uint8_t* aData,
                       size_t aLength,
-                      Image::Format aOutputImageformat = Image::Format::kRGBA,
-                      Image::ChannelDepth aOutputImageChannelDepth = Image::ChannelDepth::k8Bit);
-    static void write(const Image& aImage,
+                      ColorSpec::Format aOutputImageformat = ColorSpec::Format::kRGBA,
+                      ColorSpec::ChannelDepth aOutputImageChannelDepth = ColorSpec::ChannelDepth::k8Bit);
+    static void write(Image& aImage,
                       std::ostream& aPngDataStream);
-    static void write(const Image& aImage,
+    static void write(Image& aImage,
                       uint8_t* aData,
                       size_t aLength);
 }; // class PngIO
