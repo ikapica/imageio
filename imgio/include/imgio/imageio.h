@@ -35,7 +35,8 @@ public:
     enum class ImageFormat {kUnspecified = 0,
                             kRaw = 1,
                             kPng = 2,
-                            kJpeg = 3};
+                            kJpeg = 3,
+                            kGif = 4};
 public:
     static Image read(std::istream &aInputDataStream,
                       ImageFormat aInputImageFormat = ImageFormat::kUnspecified,
