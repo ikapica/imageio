@@ -27,6 +27,8 @@
 
 #include "dataio.h"
 
+#include <functional>
+
 #define PNGSIGSIZE 8
 
 namespace ImgIO

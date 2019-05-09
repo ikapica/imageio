@@ -64,7 +64,7 @@ public:
                             ColorSpec::ChannelDepth aChannelDepth = ColorSpec::ChannelDepth::k8Bit) const;
 
     Image::Impl& operator=(const Image::Impl& aImpl);
-    Image::Impl& operator=(Image::Impl&& aImpl);
+    Image::Impl& operator=(Image::Impl&& aImpl) noexcept ;
 
 
     static void convertRGB8BitToRGB16Bit(const uint8_t* aSrc, uint8_t* aDest, size_t aPixelsCount);

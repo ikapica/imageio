@@ -51,12 +51,12 @@ public:
 
     static void write(const Image &aImage,
                       std::ostream &aOutputDataStream,
-                      ImageFormat aImageFormat = ImageFormat::kUnspecified);
+                      ImageFormat aImageFormat);
 
     static void write(const Image &aImage,
                       uint8_t *aOutputDataBuf,
                       size_t aOutputDataBufLength,
-                      ImageFormat aImageFormat = ImageFormat::kUnspecified);
+                      ImageFormat aImageFormat);
 }; // class ImageIO
 
 } // namespace ImgIO

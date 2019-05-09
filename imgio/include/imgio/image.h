@@ -73,7 +73,7 @@ public:
 private:
     class Impl;
 private:
-    Image(Image::Impl&& aImpl);
+    explicit Image(Image::Impl&& aImpl);
 private:
     std::unique_ptr<Impl> mImpl;
 }; // class Image

@@ -39,7 +39,7 @@ namespace ImgIO
     }
 
     static void writeGif(DataWriter& aDataWriter,
-                         Image& aImage)
+                         const Image& aImage)
     {
         // TODO: Implement
     }
@@ -65,13 +65,13 @@ namespace ImgIO
                        aOutputImageChannelDepth);
     }
 
-    void GifIO::write(Image& aImage, std::ostream& aPngDataStream)
+    void GifIO::write(const Image& aImage, std::ostream& aGifDataStream)
     {
-        StreamWriter streamWriter(aPngDataStream);
+        StreamWriter streamWriter(aGifDataStream);
         writeGif(streamWriter, aImage);
     }
 
-    void GifIO::write(Image& aImage, uint8_t* aData, size_t aLength)
+    void GifIO::write(const Image& aImage, uint8_t* aData, size_t aLength)
     {
         MemoryWriter streamWriter(aData, aLength);
         writeGif(streamWriter, aImage);

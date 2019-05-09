@@ -30,56 +30,40 @@ namespace ImgIO
 Image::Impl::Impl()
 : mWidth(0),
   mHeight(0),
-  mColorFormat(ColorSpec::Format::kUnspecified),
-  mColorChannelDepth(ColorSpec::ChannelDepth::kUnspecified),
+  mColorFormat(ColorSpec::Format::kRGBA),
+  mColorChannelDepth(ColorSpec::ChannelDepth::k8Bit),
   mData(nullptr),
   mDataSize(0)
 {
 }
 
 Image::Impl::Impl(Impl&& aImpl)
-: mWidth(0),
-  mHeight(0),
-  mColorFormat(ColorSpec::Format::kUnspecified),
-  mColorChannelDepth(ColorSpec::ChannelDepth::kUnspecified),
+: mWidth(aImpl.mWidth),
+  mHeight(aImpl.mHeight),
+  mColorFormat(aImpl.mColorFormat),
+  mColorChannelDepth(aImpl.mColorChannelDepth),
   mData(nullptr),
-  mDataSize(0)
+  mDataSize(aImpl.mDataSize)
 {
     std::lock_guard<std::mutex> lock(aImpl.mDataMutex);
 
-    mWidth = aImpl.mWidth;
-    aImpl.mWidth = 0;
-
-    mHeight = aImpl.mHeight;
-    aImpl.mHeight = 0;
-
-    mColorFormat = aImpl.mColorFormat;
-    aImpl.mColorFormat = ColorSpec::Format::kUnspecified;
-
-    mColorChannelDepth = aImpl.mColorChannelDepth;
-    aImpl.mColorChannelDepth = ColorSpec::ChannelDepth::kUnspecified;
-
     mData.swap(aImpl.mData);
 
-    mDataSize = aImpl.mDataSize;
+    aImpl.mWidth = 0;
+    aImpl.mHeight = 0;
     aImpl.mDataSize = 0;
 }
 
 Image::Impl::Impl(const Impl& aImpl)
-: mWidth(0),
-  mHeight(0),
-  mColorFormat(ColorSpec::Format::kUnspecified),
-  mColorChannelDepth(ColorSpec::ChannelDepth::kUnspecified),
+: mWidth(aImpl.mWidth),
+  mHeight(aImpl.mHeight),
+  mColorFormat(aImpl.mColorFormat),
+  mColorChannelDepth(aImpl.mColorChannelDepth),
   mData(nullptr),
-  mDataSize(0)
+  mDataSize(aImpl.mDataSize)
 {
     std::lock_guard<std::mutex> lock(aImpl.mDataMutex);
 
-    mWidth = aImpl.mWidth;
-    mHeight = aImpl.mHeight;
-    mColorFormat = aImpl.mColorFormat;
-    mColorChannelDepth = aImpl.mColorChannelDepth;
-    mDataSize = aImpl.mDataSize;
     mData = std::shared_ptr<uint8_t>(new uint8_t[aImpl.mDataSize]);
     std::memcpy(mData.get(), aImpl.mData.get(), aImpl.mDataSize);
 }
@@ -89,10 +73,10 @@ Image::Impl::Impl(unsigned int aWidth,
                   ColorSpec::Format aColorFormat,
                   ColorSpec::ChannelDepth aColorChannelDepth,
                   uint8_t* aData)
-: mWidth(0),
-  mHeight(0),
-  mColorFormat(ColorSpec::Format::kUnspecified),
-  mColorChannelDepth(ColorSpec::ChannelDepth::kUnspecified),
+: mWidth(aWidth),
+  mHeight(aHeight),
+  mColorFormat(aColorFormat),
+  mColorChannelDepth(aColorChannelDepth),
   mData(nullptr),
   mDataSize(0)
 {
@@ -101,10 +85,6 @@ Image::Impl::Impl(unsigned int aWidth,
     size_t dataSize = aHeight * lineSize;
 
     if (dataSize > 0) {
-        mWidth = aWidth;
-        mHeight = aHeight;
-        mColorFormat = aColorFormat;
-        mColorChannelDepth = aColorChannelDepth;
         mData.reset(aData ? aData : new uint8_t[dataSize]);
         mDataSize = dataSize;
     }
@@ -261,7 +241,7 @@ Image::Impl& Image::Impl::operator=(const Image::Impl& aImpl)
     return *this;
 }
 
-Image::Impl& Image::Impl::operator=(Image::Impl&& aImpl)
+Image::Impl& Image::Impl::operator=(Image::Impl&& aImpl) noexcept
 {
     std::lock_guard<std::mutex> lock(aImpl.mDataMutex);
 
@@ -272,10 +252,7 @@ Image::Impl& Image::Impl::operator=(Image::Impl&& aImpl)
     aImpl.mHeight = 0;
 
     mColorFormat = aImpl.mColorFormat;
-    aImpl.mColorFormat = ColorSpec::Format::kUnspecified;
-
     mColorChannelDepth = aImpl.mColorChannelDepth;
-    aImpl.mColorChannelDepth = ColorSpec::ChannelDepth::kUnspecified;
 
     mData.swap(aImpl.mData);
 

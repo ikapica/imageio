@@ -100,13 +100,13 @@ Image Image::cropped(unsigned int aX,
                      unsigned int aWidth,
                      unsigned int aHeight) const
 {
-    return mImpl->cropped(aX, aY, aWidth, aHeight);
+    return Image(mImpl->cropped(aX, aY, aWidth, aHeight));
 }
 
 Image Image::convertedTo(ColorSpec::Format aFormat,
                          ColorSpec::ChannelDepth aChannelDepth)
 {
-    return mImpl->convertedTo(aFormat, aChannelDepth);
+    return Image(mImpl->convertedTo(aFormat, aChannelDepth));
 }
 
 } // namespace ImgIO

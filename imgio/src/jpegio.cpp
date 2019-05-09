@@ -26,6 +26,8 @@
 
 #include "dataio.h"
 
+#include <functional>
+
 namespace ImgIO
 {
 

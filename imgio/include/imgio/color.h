@@ -24,74 +24,156 @@
 #ifndef __IMAGEIO_COLOR_H__
 #define __IMAGEIO_COLOR_H__
 
+#include <memory>
+
 namespace ImgIO
 {
 
+/**
+ * Color specification class.
+ */
 class ColorSpec
 {
 public:
+    /**
+     * Color channel depth.
+     */
     enum class ChannelDepth {
-        kUnspecified = 0,
+        /**
+         * 8 bit color channel.
+         */
         k8Bit = 1,
+        /**
+         * 16 bit color channel.
+         */
         k16Bit = 2
     }; // enum class ColorChannelDepth
 
+    /**
+     * Color format.
+     */
     enum class Format {
-        kUnspecified = 0,
+        /**
+         * Monochromatic (single channel).
+         */
         kMonochromatic = 1,
+
+        /**
+         * RGB (three channels, red, green and blue).
+         */
         kRGB = 3,
+
+        /**
+         * RGBA (four channels, red, green, blue and alpha).
+         */
         kRGBA = 4,
     }; // enum class ColorFormat
 
 public:
-    ColorSpec(ColorSpec::Format aFormat, ColorSpec::ChannelDepth aChannelDepth)
-    : mFormat(aFormat), mChannelDepth(aChannelDepth)
-    {
-    }
+    /**
+     * Constructor.
+     * @param aFormat Color format.
+     * @param aChannelDepth Color channel depth.
+     */
+    ColorSpec(ColorSpec::Format aFormat, ColorSpec::ChannelDepth aChannelDepth);
 
-    virtual ~ColorSpec() = default;
+    /**
+     * Copy constructor.
+     * @param rhs Color spec to be copied.
+     */
+    ColorSpec(const ColorSpec& rhs) = default;
 
-    ColorSpec::ChannelDepth channelDepth() const
-    {
-        return mChannelDepth;
-    }
+    /**
+     * Move constructor.
+     * @param rhs Color spec to be moved.
+     */
+    ColorSpec(ColorSpec&& rhs) = default;
 
-    ColorSpec::Format format() const
-    {
-        return mFormat;
-    }
+    /**
+     * Destructor.
+     */
+    virtual ~ColorSpec();
+
+    /**
+     * Returns color channel depth.
+     * @return Color channel depth.
+     */
+    ColorSpec::ChannelDepth channelDepth() const;
+
+    /**
+     * Returns color format.
+     * @return Color format.
+     */
+    ColorSpec::Format format() const;
+
+    /**
+     * Assigment operator.
+     * @param rhs Color spec to be copied.
+     */
+    ColorSpec& operator=(const ColorSpec& rhs) = default;
+
+    /**
+     * Move assigment operator.
+     * @param rhs Color spec to be moved.
+     */
+    ColorSpec& operator=(ColorSpec&& rhs) = default;
 private:
-    Format mFormat;
-    ChannelDepth mChannelDepth;
+    class Impl;
+private:
+    std::unique_ptr<Impl> mImpl;
 }; // class ColorSpec
 
+/**
+ * RGB, 8 bit per channel color specification class.
+ */
 class ColorRGB8 : public ColorSpec
 {
 public:
+    /**
+     * Constructor.
+     */
     ColorRGB8()
     : ColorSpec(Format::kRGB, ChannelDepth::k8Bit)
     {}
 }; // class ColorRBG8
 
+/**
+ * RGBA, 8 bit per channel color specification class.
+ */
 class ColorRGBA8 : public ColorSpec
 {
 public:
+    /**
+     * Constructor.
+     */
     ColorRGBA8()
     : ColorSpec(Format::kRGBA, ChannelDepth::k8Bit)
     {}
 }; // class ColorRBGA8
 
+/**
+ * RGB, 16 bits per channel color specification class.
+ */
 class ColorRGB16 : public ColorSpec
 {
 public:
+    /**
+     * Constructor.
+     */
     ColorRGB16()
     : ColorSpec(Format::kRGB, ChannelDepth::k16Bit)
     {}
 }; // class ColorRBG16
 
+/**
+ * RGBA, 16 bit per channel color specification class.
+ */
 class ColorRGBA16 : public ColorSpec
 {
 public:
+    /**
+     * Constructor.
+     */
     ColorRGBA16()
     : ColorSpec(Format::kRGBA, ChannelDepth::k16Bit)
     {}
